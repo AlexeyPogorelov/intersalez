@@ -12,37 +12,9 @@ html(lang='ru')
 
 		section.test
 			.container
-				b JS-XLSX (XLSX/XLSB/XLSM/XLS/XML) Live Demo
-				br
-				| Output Format:
-				select(name='format')
-					option(value='csv', selected='')  CSV
-					option(value='json')  JSON
-					option(value='form')  FORMULAE
-				br
-				//
-					<input type="radio" name="format" value="csv" checked> CSV<br>
-					<input type="radio" name="format" value="json"> JSON<br>
-					<input type="radio" name="format" value="form"> FORMULAE<br>
-				#drop Drop an XLSX / XLSM / XLSB / ODS / XLS / XML file here to see sheet data
 				p
 					input#xlf(type='file', name='xlfile')
-					|  ... or click here to select a file
-				textarea#b64data ... or paste a base64-encoding here
-				input#dotext(type='button', value='Click here to process the base64 text', onclick='b64it();')
-				br
-				| Advanced Demo Options: 
-				br
-				| Use Web Workers: (when available) 
-				input(type='checkbox', name='useworker', checked='')
-				br
-				| Use Transferrables: (when available) 
-				input(type='checkbox', name='xferable', checked='')
-				br
-				| Use readAsBinaryString: (when available) 
-				input(type='checkbox', name='userabs', checked='')
-				br
-				pre#out.
+				pre#out
 				br
 
 
