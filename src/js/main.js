@@ -97,20 +97,29 @@ var defaults = {
 	mailbody: 'This is test EMAIL!'
 }
 var usersTable = document.getElementById('usersTable');
+var usersLength = 0;
 
 function closestTag (el, tag) {
 	var current = el;
-	if (typeof el !== "object") return;
+	if (typeof el !== "object" && typeof tag !== "string") return;
 	if (!current.tagName) return;
 	while (current.parentNode) {
 		current = current.parentNode;
-		if (current.tagName === tag) {
+		if (current.tagName.toLowerCase() === tag.toLowerCase()) {
 			return current;
 			break;
 		}
 	}
 	return el;
 }
+document.getElementById('addCustomMail').addEventListener('click', function () {
+	console.log(this.parentNode.getElementsByTagName('form'))
+	var parentNode, form;
+	parentNode = this.parentNode;
+	form = parentNode.getElementsByTagName('form');
+	form[0].className = '';
+	parentNode.removeChild(this);
+},false)
 function hideFileForm () {
 	var formSection, customEmailBody, customEmailBodySection;
 	formSection = document.getElementById('input-data-block');
@@ -118,9 +127,13 @@ function hideFileForm () {
 	formSection.innerHTML = '';
 	customEmailBody = document.getElementById('customEmailBody');
 	customEmailBodySection = closestTag(customEmailBody, 'section');
-	customEmailBodySection.className = '';
-	// console.log(customEmailBodySection);
+	customEmailBodySection.className = 'customEmailBody';
 	customEmailBody.className = '';
+	customEmailBody.addEventListener('change', function (e) {
+		if (this.value) {
+			defaults.mailbody = this.value;
+		}
+	}, false);
 }
 function generateUsersTable (data) {
 	var i, clients;
@@ -131,22 +144,27 @@ function generateUsersTable (data) {
 	}
 	for (i = 0; i < clients.length; i++) {
 		renderUser(clients[i]);
-		console.log(clients[i]);
+		// console.log(clients[i]);
 	}
 }
 function renderUser (user) {
-	var element, i, email, name, subject, text, checkboxCell, emailCell, nameCell;
+	var element, i, id, email, name, subject, text, checkboxCell, checkbox, emailCell, nameCell;
+	i = 0;
 	email = user.email;
 	subject = user.subject || defaults.subject;
 	name = user.name ? ', ' + name.replace('%', '') : '';
 	text = user.text || false;
+	id = email.substr(0,4) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
 	element = document.createElement('tr');
+	element.id = id;
 
 	checkboxCell = document.createElement('td');
 	emailCell = document.createElement('td');
 	nameCell = document.createElement('td');
 
-	checkboxCell.innerHTML = '<input type="checkbox">';
+	checkbox = document.createElement('input');
+	checkbox.type = "checkbox";
+	checkboxCell.appendChild( checkbox );
 	emailCell.appendChild( createMailLink(email, subject, generateMailBody(text)) );
 	nameCell.innerHTML = '<span>' + name + '</span>';
 
@@ -155,6 +173,21 @@ function renderUser (user) {
 	element.appendChild(nameCell);
 
 	usersTable.appendChild(element);
+	element.addEventListener('click', function (e) {
+		var link;
+		if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'checkbox' && !e.target.checked) {
+			// console.log(element);
+			element.className = '';
+			e.target.checked = false;
+		} else {
+			link = element.getElementsByTagName('a');
+			if (link.length === 0 || element.className === 'disabled') return;
+			link[0].click();
+			checkbox.checked = true;
+			// console.log(link);
+			element.className = 'disabled';
+		}
+	}, false)
 }
 function createMailLink (email, subject, text) {
 	var link = document.createElement('a');

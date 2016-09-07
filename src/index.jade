@@ -18,7 +18,8 @@ html(lang='ru')
 				br
 		section.customEmailBody.hidden
 			.container
-				form(action="#")
+				button#addCustomMail edit email
+				form(action="#").hidden
 					.form-group
 						label(for="customEmailBody") Enter custom email here
 						textarea#customEmailBody(name="customEmailBody", cols="30", rows="10")
