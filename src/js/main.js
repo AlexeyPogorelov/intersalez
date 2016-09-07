@@ -1,14 +1,109 @@
+var notification = (function () {
+	var opened = [],
+		lastTop = 0,
+		animationPrefix = (function () {
+			var t,
+			el = document.createElement("fakeelement");
+			var transitions = {
+				"WebkitTransition": "webkitAnimationEnd",
+				"OTransition": "oAnimationEnd",
+				"MozTransition": "animationend",
+				"transition": "animationend"
+			};
+			for (t in transitions) {
 
+				if (el.style[t] !== undefined) {
+
+					return transitions[t];
+
+				}
+
+			}
+		})();
+
+	options = {
+		'notificationClass': 'notification',
+		'marginTop': 10,
+		'timeout': 10000
+	};
+
+	var plg = {
+		show: function ( text, selector ) {
+			var $notification, $parent;
+
+			if (!(typeof text === 'string' && text.length > 1)) return false;
+
+			$notification = plg.create( text );
+
+			if (selector) {
+				$parent = $( selector );
+			} else {
+				$parent = $('body');
+			}
+			if ($parent.length < 1) $parent = $('body');
+			$notification
+				.appendTo( $parent )
+				.one( animationPrefix, function () {
+					plg.hide( $notification );
+				});
+
+			setTimeout(function() {
+				plg.hide( $notification );
+			}, options.timeout);
+
+		},
+		hide: function ($notification) {
+
+			for ( var y = 0; y < opened.length; y++ ) {
+
+				if ($notification === opened[y]) {
+					opened.splice(y, 1);
+					$notification.remove();
+				}
+
+			}
+
+			if (opened.length === 0) {
+				lastTop = 0;
+			}
+
+		},
+		calculateTop: function () {
+			var top = 0;
+			for (var i = 0; i < opened.length; i++) {
+				top += opened[i].prop('scrollHeight') + options.marginTop;
+			}
+			return top;
+		},
+		create: function (text) {
+			var top = lastTop + options.marginTop;
+			$notification = $('<div>')
+				.addClass(options.notificationClass)
+				.css({
+					'top': top
+				})
+				.html( text );
+			setTimeout(function() {
+				lastTop = top + $notification.prop('scrollHeight');
+				opened.push($notification);
+			}, 1);
+			return $notification;
+		}
+
+	};
+
+	return plg.show;
+})();
 
 var X = XLSX;
-// var XW = {
-// 	/* worker message */
-// 	msg: 'xlsx',
-// 	/* worker scripts */
-// 	rABS: '../external/js-xlsx/xlsxworker2.js',
-// 	norABS: '../external/js-xlsx/xlsxworker1.js',
-// 	noxfer: '../external/js-xlsx/xlsxworker.js'
-// };
+var XWbk = {
+	/* worker message */
+	msg: 'xlsx',
+	/* worker scripts */
+	rABS: '../external/js-xlsx/xlsxworker2.js',
+	norABS: '../external/js-xlsx/xlsxworker1.js',
+	noxfer: '../external/js-xlsx/xlsxworker.js'
+};
 var XW = {
 	/* worker message */
 	msg: 'xlsx',
@@ -39,7 +134,13 @@ function s2ab(s) {
 }
 
 function xw_xfer(data, cb) {
-	var worker = new Worker(true ? XW.rABS : XW.norABS);
+	var worker;
+	try {
+		worker = new Worker(XW.rABS);
+	} catch (e) {
+		XW = XWbk;
+		worker = new Worker(XW.rABS);
+	}
 	worker.onmessage = function(e) {
 		console.log(e.data.t);
 		switch(e.data.t) {
@@ -71,31 +172,32 @@ function process_wb(wb) {
 	generateUsersTable( to_json(wb) );
 	hideFileForm();
 	return;
-	var output = "";
-	output = JSON.stringify(to_json(wb), 2, 2);
-	if(out.innerText === undefined) out.textContent = output;
-	else out.innerText = output;
-	if(typeof console !== 'undefined') console.log("output", new Date());
 }
 
 
 var xlf = document.getElementById('xlf');
 function handleFile(e) {
-	rABS = true;
-	xlf.className = 'disabled';
-	use_worker = true;
 	var files = e.target.files;
 	var f = files[0];
-	{
-		var reader = new FileReader();
-		var name = f.name;
+	var reader = new FileReader();
+	var name = f.name;
+	xlf.className = 'disabled';
+	if (f.name.search('.txt') > 0) {
 		reader.onload = function(e) {
-			if(typeof console !== 'undefined') console.log("onload", new Date(), rABS, use_worker);
+			var data = e.target.result;
+			restoreSentEmails(data);
+			xlf.value = null;
+			xlf.className = '';
+			notification('file loaded');
+		};
+		reader.readAsBinaryString(f);
+	} else {
+		reader.onload = function(e) {
+			if(typeof console !== 'undefined') console.log("onload", new Date(), true, true);
 			var data = e.target.result;
 			xw_xfer(data, process_wb);
 		};
-		if(rABS) reader.readAsBinaryString(f);
-		else reader.readAsArrayBuffer(f);
+		reader.readAsBinaryString(f);
 	}
 }
 if(xlf.addEventListener) xlf.addEventListener('change', handleFile, false);
@@ -103,10 +205,15 @@ if(xlf.addEventListener) xlf.addEventListener('change', handleFile, false);
 var defaults = {
 	subject: 'Intertech',
 	mailbody: 'This is test EMAIL!'
-}
+};
 var usersTable = document.getElementById('usersTable');
 var usersLength = 0;
 var mailbody = null;
+
+function generateMailBody (data) {
+	if (data) return data;
+	return mailbody || defaults.mailbody;
+}
 
 function closestTag (el, tag) {
 	var current = el;
@@ -116,21 +223,19 @@ function closestTag (el, tag) {
 		current = current.parentNode;
 		if (current.tagName.toLowerCase() === tag.toLowerCase()) {
 			return current;
-			break;
 		}
 	}
 	return el;
 }
 document.getElementById('addCustomMail').addEventListener('click', function () {
-	console.log(this.parentNode.getElementsByTagName('form'))
 	var parentNode, form;
 	parentNode = this.parentNode;
 	form = parentNode.getElementsByTagName('form');
 	form[0].className = '';
 	parentNode.removeChild(this);
-},false)
+}, false);
 function hideFileForm () {
-	var formSection, customEmailBody, customEmailBodySection;
+	var formSection, customEmailBody, customEmailBodySection, fixedControls;
 	formSection = document.getElementById('input-data-block');
 	formSection.className = 'hidden';
 	formSection.innerHTML = '';
@@ -138,6 +243,8 @@ function hideFileForm () {
 	customEmailBodySection = closestTag(customEmailBody, 'section');
 	customEmailBodySection.className = 'customEmailBody';
 	customEmailBody.className = '';
+	fixedControls = document.getElementById('fixed-controls');
+	fixedControls.className = 'fixed-controls';
 	customEmailBody.addEventListener('change', function (e) {
 		if (this.value) {
 			mailbody = this.value;
@@ -145,7 +252,7 @@ function hideFileForm () {
 	}, false);
 }
 function generateUsersTable (data) {
-	var i, clients;
+	var i, clients, page;
 	if (typeof data !== "object") return;
 	for (page in data) {
 		clients = data[page];
@@ -153,7 +260,6 @@ function generateUsersTable (data) {
 	}
 	for (i = 0; i < clients.length; i++) {
 		renderUser(clients[i]);
-		// console.log(clients[i]);
 	}
 }
 function renderUser (user) {
@@ -169,9 +275,9 @@ function renderUser (user) {
 
 	text = user.text || false;
 	try {
-		id = email.substr(0,4) + (Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
+		id = email.substr(0,4) + (Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + usersLength++;
 	} catch (e) {
-		id = parseInt(Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
+		id = parseInt(Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + usersLength++;
 	}
 	element = document.createElement('tr');
 	element.id = id;
@@ -193,26 +299,28 @@ function renderUser (user) {
 	if (localStorage.getItem(email)) {
 		checkbox.checked = true;
 		element.className = 'disabled';
-	};
+	}
 
 	usersTable.appendChild(element);
 	element.addEventListener('click', function (e) {
 		var link;
 		if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'checkbox' && !e.target.checked) {
-			// console.log(element);
 			element.className = '';
 			e.target.checked = false;
+			localStorage.removeItem(email);
 		} else {
 			link = createMailLink(email, subject, generateMailBody(text));
 			link.click();
+			link = null;
 			checkbox.checked = true;
 			element.className = 'disabled';
 			localStorage.setItem(email, true);
 		}
-	}, false)
+	}, false);
 }
 function createMailLink (email, subject, text) {
 	var link = document.createElement('a');
+	link.target = '_blank';
 	link.innerHTML = email;
 	if (!text) {
 		text = mailbody;
@@ -225,7 +333,39 @@ function createMailLink (email, subject, text) {
 		text;
 	return link;
 }
-function generateMailBody(data) {
-	if (data) return data;
-	return mailbody || defaults.mailbody;
+function saveSentEmails () {
+	var array = [];
+	for (var i = 0; i < localStorage.length; i++) {
+		array.push(localStorage.key(i));
+	}
+	saveFile( array.toString() );
 }
+function restoreSentEmails (data) {
+	var i;
+	data = data.split(',');
+	for (i = 0; i < data.length; i++) {
+		localStorage.setItem(data[i], true);
+	}
+}
+function saveFile (string) {
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(string));
+	element.setAttribute('download', "emails.txt");
+	element.click();
+	element = null;
+}
+function autoSend () {
+	var rows = document.getElementsByTagName('tr');
+	for (var i = 0; i < rows.length; i++) {
+		if (rows[i].className !== "disabled") {
+			rows[i].click();
+			return;
+		}
+	}
+}
+
+window.addEventListener('keydown', function (e) {
+	if (e.ctrlKey && e.keyCode == 13) {
+		autoSend();
+	}
+}, false);
