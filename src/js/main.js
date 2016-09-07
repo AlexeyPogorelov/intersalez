@@ -1,13 +1,21 @@
 
 
 var X = XLSX;
+// var XW = {
+// 	/* worker message */
+// 	msg: 'xlsx',
+// 	/* worker scripts */
+// 	rABS: '../external/js-xlsx/xlsxworker2.js',
+// 	norABS: '../external/js-xlsx/xlsxworker1.js',
+// 	noxfer: '../external/js-xlsx/xlsxworker.js'
+// };
 var XW = {
 	/* worker message */
 	msg: 'xlsx',
 	/* worker scripts */
-	rABS: '../external/js-xlsx/xlsxworker2.js',
-	norABS: '../external/js-xlsx/xlsxworker1.js',
-	noxfer: '../external/js-xlsx/xlsxworker.js'
+	rABS: 'http://pogorelov.cc.ua/intersalez/external/js-xlsx/xlsxworker2.js',
+	norABS: 'http://pogorelov.cc.ua/intersalez/external/js-xlsx/xlsxworker1.js',
+	noxfer: 'http://pogorelov.cc.ua/intersalez/external/js-xlsx/xlsxworker.js'
 };
 
 function fixdata(data) {
@@ -98,6 +106,7 @@ var defaults = {
 }
 var usersTable = document.getElementById('usersTable');
 var usersLength = 0;
+var mailbody = null;
 
 function closestTag (el, tag) {
 	var current = el;
@@ -131,7 +140,7 @@ function hideFileForm () {
 	customEmailBody.className = '';
 	customEmailBody.addEventListener('change', function (e) {
 		if (this.value) {
-			defaults.mailbody = this.value;
+			mailbody = this.value;
 		}
 	}, false);
 }
@@ -152,9 +161,18 @@ function renderUser (user) {
 	i = 0;
 	email = user.email;
 	subject = user.subject || defaults.subject;
-	name = user.name ? ', ' + name.replace('%', '') : '';
+	try {
+		name = user.name ? ', ' + name.replace('%', '') : '';
+	} catch (e) {
+		name = '';
+	}
+
 	text = user.text || false;
-	id = email.substr(0,4) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
+	try {
+		id = email.substr(0,4) + (Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
+	} catch (e) {
+		id = parseInt(Math.random()*10000) + new Date().getTime().toString().substr(-8,8) + ++usersLength;
+	}
 	element = document.createElement('tr');
 	element.id = id;
 
@@ -172,6 +190,11 @@ function renderUser (user) {
 	element.appendChild(emailCell);
 	element.appendChild(nameCell);
 
+	if (localStorage.getItem(email)) {
+		checkbox.checked = true;
+		element.className = 'disabled';
+	};
+
 	usersTable.appendChild(element);
 	element.addEventListener('click', function (e) {
 		var link;
@@ -180,18 +203,20 @@ function renderUser (user) {
 			element.className = '';
 			e.target.checked = false;
 		} else {
-			link = element.getElementsByTagName('a');
-			if (link.length === 0 || element.className === 'disabled') return;
-			link[0].click();
+			link = createMailLink(email, subject, generateMailBody(text));
+			link.click();
 			checkbox.checked = true;
-			// console.log(link);
 			element.className = 'disabled';
+			localStorage.setItem(email, true);
 		}
 	}, false)
 }
 function createMailLink (email, subject, text) {
 	var link = document.createElement('a');
 	link.innerHTML = email;
+	if (!text) {
+		text = mailbody;
+	}
 	link.href = 'mailto:' +
 		email +
 		'?subject=' +
@@ -202,5 +227,5 @@ function createMailLink (email, subject, text) {
 }
 function generateMailBody(data) {
 	if (data) return data;
-	return defaults.mailbody;
+	return mailbody || defaults.mailbody;
 }

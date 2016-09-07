@@ -42,12 +42,27 @@ body
 	margin: 20px 0 60px 0
 	width: 100%
 	border-collapse: collapse
+	counter-reset: userList
 	tr
 		cursor: pointer
 		&.disabled
 			cursor: default
+			pointer-events: none
+			input
+				pointer-events: all
+		&:nth-child(odd)
+			background: #f9f9f9
 		&:hover
-			background: #eee
+			background: #d6f4f9
+		&:before
+			counter-increment: userList
+			content: counter(userList)
+			pointer-events: none
+			color: #d4d4d4;
+			font-size: 22px;
+			position: relative;
+			top: 2px;
+			left: -30px;
 	td
 		border: 1px solid #ccc
 		padding: 4px 10px
