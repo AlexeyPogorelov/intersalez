@@ -251,6 +251,15 @@ function hideFileForm () {
 		}
 	}, false);
 }
+function replaceTemplate (text, object) {
+	if (typeof object !== 'object' || typeof text !== 'string' || text.length < 5) return text;
+	var prop, expr;
+	for (prop in object) {
+		expr = new RegExp('{{' + prop + '}}', 'g');
+		text = text.replace(expr, object[prop]);
+		return text;
+	}
+}
 function generateUsersTable (data) {
 	var i, clients, page;
 	if (typeof data !== "object") return;
@@ -310,7 +319,9 @@ function renderUser (user) {
 			e.target.checked = false;
 			localStorage.removeItem(email);
 		} else {
-			link = createMailLink(email, subject, generateMailBody(text));
+			link = createMailLink(email, subject, generateMailBody( replaceTemplate(text, {
+				name: name
+			}) ));
 			link.click();
 			link = null;
 			checkbox.checked = true;
