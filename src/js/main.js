@@ -265,12 +265,13 @@ function generateUsersTable (data) {
 function renderUser (user) {
 	var element, i, id, email, name, subject, text, checkboxCell, checkbox, emailCell, nameCell;
 	i = 0;
+	// console.log( user );
 	email = user.email;
 	subject = user.subject || defaults.subject;
 	try {
 		name = user.name ? ', ' + name.replace('%', '') : '';
 	} catch (e) {
-		name = '';
+		name = user.name;
 	}
 
 	text = user.text || false;
