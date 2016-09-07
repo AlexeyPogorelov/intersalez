@@ -20,8 +20,9 @@ body
 //----------------------------------
 // TEST
 //----------------------------------
-section.test-block
-	margin: 100px 0
+
+.hidden
+	display: none
 
 #xlf
 	display: block
@@ -29,6 +30,16 @@ section.test-block
 	height: 100px
 	background: none
 	border: 4px solid #eee
+	.disabled
+		pointer-events: none
+
+#usersTable
+	padding: 20px
+	td
+		padding: 4px 10px
+
+.disabled
+	opacity: 0.3
 
 //----------------------------------
 // END TEST

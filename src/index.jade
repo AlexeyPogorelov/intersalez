@@ -10,12 +10,21 @@ html(lang='ru')
 		include ./partials/noscript.jade
 		include ./partials/navigation.jade
 
-		section.test
+		section#input-data-block.input-data-block
 			.container
 				p
 					input#xlf(type='file', name='xlfile')
 				pre#out
 				br
+		section.customEmailBody.hidden
+			.container
+				form(action="#")
+					.form-group
+						label(for="customEmailBody") Enter custom email here
+						textarea#customEmailBody(name="customEmailBody", cols="30", rows="10")
+		section.clients-list
+			.container
+				table#usersTable
 
 
 		include ./partials/footer.jade
