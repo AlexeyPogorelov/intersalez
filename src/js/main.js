@@ -28,12 +28,12 @@ var notification = (function () {
 	};
 
 	var plg = {
-		show: function ( text, selector ) {
+		show: function ( text, cls, selector ) {
 			var $notification, $parent;
 
 			if (!(typeof text === 'string' && text.length > 1)) return false;
 
-			$notification = plg.create( text );
+			$notification = plg.create( text, cls );
 
 			if (selector) {
 				$parent = $( selector );
@@ -75,7 +75,7 @@ var notification = (function () {
 			}
 			return top;
 		},
-		create: function (text) {
+		create: function (text, cls) {
 			var top = lastTop + options.marginTop;
 			$notification = $('<div>')
 				.addClass(options.notificationClass)
@@ -83,6 +83,9 @@ var notification = (function () {
 					'top': top
 				})
 				.html( text );
+			if (cls && typeof cls === 'string') {
+				$notification.addClass(cls);
+			}
 			setTimeout(function() {
 				lastTop = top + $notification.prop('scrollHeight');
 				opened.push($notification);
@@ -184,11 +187,16 @@ function handleFile(e) {
 	xlf.className = 'disabled';
 	if (f.name.search('.txt') > 0) {
 		reader.onload = function(e) {
-			var data = e.target.result;
-			restoreSentEmails(data);
+			var data = e.target.result,
+				restored;
+			restored = restoreSentEmails(data);
 			xlf.value = null;
 			xlf.className = '';
-			notification('file loaded');
+			if (restored > 0) {
+				notification('file loaded');
+			} else {
+				notification('file loaded', 'error');
+			}
 		};
 		reader.readAsBinaryString(f);
 	} else {
@@ -358,6 +366,7 @@ function restoreSentEmails (data) {
 	for (i = 0; i < data.length; i++) {
 		localStorage.setItem(data[i], true);
 	}
+	return i;
 }
 function saveFile (string) {
 	var element = document.createElement('a');
