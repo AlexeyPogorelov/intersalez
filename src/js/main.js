@@ -11,13 +11,9 @@ var notification = (function () {
 				"transition": "animationend"
 			};
 			for (t in transitions) {
-
 				if (el.style[t] !== undefined) {
-
 					return transitions[t];
-
 				}
-
 			}
 		})();
 
@@ -55,12 +51,10 @@ var notification = (function () {
 		hide: function ($notification) {
 
 			for ( var y = 0; y < opened.length; y++ ) {
-
 				if ($notification === opened[y]) {
 					opened.splice(y, 1);
 					$notification.remove();
 				}
-
 			}
 
 			if (opened.length === 0) {
@@ -265,6 +259,7 @@ function replaceTemplate (text, object) {
 	for (prop in object) {
 		expr = new RegExp('{{' + prop + '}}', 'g');
 		text = text.replace(expr, object[prop]);
+		text = encodeURIComponent(text.trim()) ;
 		return text;
 	}
 }
@@ -286,8 +281,9 @@ function renderUser (user) {
 	email = user.email;
 	subject = user.subject || defaults.subject;
 	try {
-		name = user.name ? ', ' + name.replace('%', '') : '';
+		name = user.name ? ', ' + user.name.replace(/%/g, '') : '';
 	} catch (e) {
+		console.log(e);
 		name = user.name;
 	}
 
@@ -327,9 +323,7 @@ function renderUser (user) {
 			e.target.checked = false;
 			localStorage.removeItem(email);
 		} else {
-			link = createMailLink(email, subject, generateMailBody( replaceTemplate(text, {
-				name: name
-			}) ));
+			link = createMailLink(email, subject, replaceTemplate(generateMailBody(text), {name: name }) );
 			link.click();
 			link = null;
 			checkbox.checked = true;
@@ -369,7 +363,8 @@ function restoreSentEmails (data) {
 	return i;
 }
 function saveFile (string) {
-	var element = document.createElement('a');
+	var element = document.createElement('span');
+	element.className = 'user-email'
 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(string));
 	element.setAttribute('download', "emails.txt");
 	element.click();
