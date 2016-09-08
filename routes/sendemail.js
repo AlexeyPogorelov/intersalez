@@ -45,7 +45,7 @@ var request = sg.emptyRequest({
 router.post('/', function(req, res, next) {
  // console.log(req.body);
 	res.json({ok:true});
-	return;
+	// return;
 	sg.API(sg.emptyRequest({
 		method: 'POST',
 		path: '/v3/mail/send',

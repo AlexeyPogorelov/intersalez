@@ -1,5 +1,39 @@
-extends layout
+doctype html
+html(lang='ru')
+	head
+		title greatest page
 
-block content
-  h1= title
-  p Welcome to #{title}
+		meta(charset='UTF-8')
+		meta(name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no")
+		link(rel='stylesheet', href='css/concated.css')
+
+	body
+
+		noscript
+			h2 Your browser does not support JavaScript!
+
+		section#input-data-block.input-data-block
+			.container
+				p
+					input#xlf(type='file', name='xlfile')
+				pre#out
+				br
+		section.customEmailBody.hidden
+			.container
+				button#addCustomMail edit email
+				form(action="#").hidden
+					.form-group
+						label(for="customEmailBody") Enter custom email here
+						textarea#customEmailBody(name="customEmailBody", cols="30", rows="10")
+		section.clients-list
+			.container
+				table#usersTable
+
+		section#fixed-controls.fixed-controls.hidden
+			button#autoSend(onclick="autoSend()") send
+			button#saveSentEmails(onclick="saveSentEmails()") save
+
+	script(src='external/jquery/dist/jquery.min.js')
+	script(src='external/jquery.browser/dist/jquery.browser.min.js')
+	script(src='external/js-xlsx/dist/xlsx.full.min.js')
+	script(src='js/main.js')

@@ -1,0 +1,146 @@
+@import _mixins
+
+.chromeperfectpixel-initial-block iframe,
+#chromeperfectpixel-supported-by
+	display: none !important
+#__bs_notify__
+	display: none !important
+	opacity: 0 !important
+
+body
+	font: $font-stack
+	&::-webkit-scrollbar
+		height: 0
+		width: 0
+
+*
+	transition: all .3s
+
+
+//----------------------------------
+// TEST
+//----------------------------------
+
+.hidden
+	display: none
+
+#xlf
+	background: none
+	border: 4px solid #eee
+	display: block
+	text-align: center
+	margin: 40px 0
+	height: 100px
+	width: 100%
+	.disabled
+		pointer-events: none
+		a
+			color: #eee
+
+#usersTable
+	padding: 20px
+	margin: 20px 0 60px 40px
+	width: 100%
+	border-collapse: collapse
+	counter-reset: userList
+	a
+		pointer-events: none
+	tr
+		cursor: pointer
+		&.disabled
+			cursor: default
+			pointer-events: none
+			input
+				pointer-events: all
+		&:nth-child(odd)
+			background: #f9f9f9
+		&:hover
+			background: #d6f4f9
+		&:before
+			counter-increment: userList
+			content: counter(userList)
+			pointer-events: none
+			color: #d4d4d4;
+			font-size: 22px;
+			position: relative;
+			top: 2px;
+			left: -30px;
+	td
+		border: 1px solid #ccc
+		padding: 4px 10px
+		&:first-child
+			width: 0%
+		&:nth-child(2)
+			width: 100%
+
+.customEmailBody
+	text-align: center
+	label
+		display: block
+		margin: 20px 0 0
+		width: 100%
+	textarea
+		margin: 10px 0 20px
+		display: inline-block
+		border: 2px solid #ccc
+		width: 100%
+		height: 400px
+		min-width: 300px
+		padding: 10px 20px
+		font-size: 13px
+		line-height: 1.3em
+		&:focus, &:active
+			box-shadow: outset 0 0 5px #62c1eb
+			outline-color: #62c1eb
+			border-color: #62c1eb
+
+.disabled
+	opacity: 0.3
+
+.fixed-controls
+	background: rgba(255, 255, 255, 0.8)
+	position: fixed
+	bottom: 0
+	left: 0
+	right: 0
+	button
+		// background: #fff
+		border: 2px solid #000
+		padding: 0 10px
+		float: right
+		margin: 10px 5px
+		&:hover
+			background: #d6f4f9
+
+//----------------------------------
+// END TEST
+//----------------------------------
+
+
+@keyframes notification
+	from
+		opacity: 0
+		transform: translateY(20px) translateX(-50%) translateZ(0)
+	10%
+		opacity: 1
+		transform: translateY(0) translateX(-50%) translateZ(0)
+	90%
+		opacity: 1
+		transform: translateY(0) translateX(-50%) translateZ(0)
+	to
+		opacity: 0
+		transform: translateY(-20px) translateX(-50%) translateZ(0)
+
+
+.notification
+	animation: notification 4s
+	animation-fill-mode: both
+	position: fixed
+	left: 50%
+	top: 0
+	color: #fff
+	padding: 10px 37px
+	background: #00bf82
+	z-index: 20
+	&.error
+		background: $error-color
