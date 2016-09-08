@@ -281,9 +281,9 @@ function renderUser (user) {
 	email = user.email;
 	subject = user.subject || defaults.subject;
 	try {
-		name = user.name ? ', ' + user.name.replace(/%/g, '') : '';
+		name = user.name ? ' ' + user.name.replace(/%/g, '') : '';
 	} catch (e) {
-		console.log(e);
+		// console.log(e);
 		name = user.name;
 	}
 
