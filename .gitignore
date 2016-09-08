@@ -1,0 +1,9 @@
+*.log
+*.psd
+
+Thumbs.db
+
+idea/*
+bower_components/*
+node_modules/*
+templates/*
