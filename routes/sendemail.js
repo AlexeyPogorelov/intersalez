@@ -54,14 +54,14 @@ router.post('/', function(req, res, next) {
 				{
 					to: [
 						{
-							email: 'alexey.intertech@gmail.com',
+							email: req.body.email,
 						},
 					],
 					subject: req.body.subject,
 				},
 			],
 			from: {
-				email: req.body.email,
+				email: req.body.from,
 			},
 			content: [
 				{

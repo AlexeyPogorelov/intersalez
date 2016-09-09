@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <title>greatest page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <!-- open graph-->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="---">
+    <meta property="og:description" content="---">
+    <meta property="og:image" content="---">
+    <meta property="og:url" content="---">
+    <meta name="twitter:image" content="---">
+    <meta name="twitter:title" content="---">
+    <meta name="twitter:url" content="---">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:description" content="---">
+    <link rel="stylesheet" href="css/concated.css">
+  </head>
+  <body>
+    <noscript>
+      <h2>Your browser does not support JavaScript!</h2>
+    </noscript>
+    <section id="input-data-block" class="input-data-block">
+      <div class="container">
+        <p>
+          <input id="xlf" type="file" name="xlfile">
+        </p>
+        <pre id="out"></pre><br>
+      </div>
+    </section>
+    <section class="customEmailBody hidden">
+      <div class="container">
+        <button id="addCustomMail">edit email</button>
+        <form action="#" class="hidden">
+          <div class="form-group">
+            <label for="customEmailBody">Enter custom email here</label>
+            <textarea id="customEmailBody" name="customEmailBody" cols="30" rows="10"></textarea>
+          </div>
+        </form>
+      </div>
+    </section>
+    <section class="clients-list">
+      <div class="container">
+        <table id="usersTable"></table>
+      </div>
+    </section>
+    <section id="fixed-controls" class="fixed-controls hidden">
+      <button id="autoSend" onclick="autoSend()">send</button>
+      <button id="saveSentEmails" onclick="saveSentEmails()">save</button>
+    </section>
+    <!-- footer-->
+    <div class="footer"></div>
+  </body>
+  <script src="external/jquery/dist/jquery.min.js"></script>
+  <script src="external/jquery.browser/dist/jquery.browser.min.js"></script>
+  <script src="external/js-xlsx/dist/xlsx.full.min.js"></script>
+  <script src="js/main.js"></script>
+</html>

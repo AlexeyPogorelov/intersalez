@@ -323,19 +323,16 @@ function renderUser (user) {
 			e.target.checked = false;
 			localStorage.removeItem(email);
 		} else {
-			// link = createMailLink(email, subject, replaceTemplate(generateMailBody(text), {name: name }) );
-			// link.click();
-			// link = null;
-
-			sendEmail(email, subject, replaceTemplate(generateMailBody(text), {name: name }) );
-
+			link = createMailLink(email, subject, replaceTemplate(generateMailBody(text), {name: name }) );
+			link.click();
+			link = null;
 			checkbox.checked = true;
 			element.className = 'disabled';
 			localStorage.setItem(email, true);
 		}
 	}, false);
 }
-function createMailLink (email, subject, text, from) {
+function createMailLink (email, subject, text) {
 	var link = document.createElement('a');
 	link.target = '_blank';
 	link.innerHTML = email;
@@ -349,22 +346,6 @@ function createMailLink (email, subject, text, from) {
 		'&body=' +
 		text;
 	return link;
-}
-function sendEmail (email, subject, text, from) {
-		// email: email,
-	$.post('/sendemail', {
-		email: 'alexey.intertech@gmail.com',
-		subject: subject || defaults.subject,
-		text: text,
-		from: from
-	}, function () {
-		notification('done!');
-	}, 'html').done(function() {
-		notification( "success" );
-	}).fail(function() {
-		notification( "error", "error" );
-		localStorage.removeItem(email);
-	});
 }
 function saveSentEmails () {
 	var array = [];
@@ -383,7 +364,7 @@ function restoreSentEmails (data) {
 }
 function saveFile (string) {
 	var element = document.createElement('span');
-	element.className = 'user-email';
+	element.className = 'user-email'
 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(string));
 	element.setAttribute('download', "emails.txt");
 	element.click();
@@ -394,16 +375,9 @@ function autoSend () {
 	for (var i = 0; i < rows.length; i++) {
 		if (rows[i].className !== "disabled") {
 			rows[i].click();
-			return false;
+			return;
 		}
-		return false;
 	}
-	return true;
-}
-function allSend () {
-	var intetval = setInterval(function () {
-		if (autoSend ()) clearInterval(intetval);
-	}, 300);
 }
 
 window.addEventListener('keydown', function (e) {

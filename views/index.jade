@@ -23,13 +23,20 @@ html(lang='ru')
 				button#addCustomMail edit email
 				form(action="#").hidden
 					.form-group
-						label(for="customEmailBody") Enter custom email here
+						label(for="customSubject") Subject
+						input#customSubject(type="text")
+					.form-group
+						label(for="from") From
+						input#from(type="text")
+					.form-group
+						label(for="customEmailBody") Email
 						textarea#customEmailBody(name="customEmailBody", cols="30", rows="10")
 		section.clients-list
 			.container
 				table#usersTable
 
 		section#fixed-controls.fixed-controls.hidden
+			button#allSend(onclick="allSend()") START!!!
 			button#autoSend(onclick="autoSend()") send
 			button#saveSentEmails(onclick="saveSentEmails()") save
 
