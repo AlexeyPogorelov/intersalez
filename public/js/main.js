@@ -206,7 +206,8 @@ if(xlf.addEventListener) xlf.addEventListener('change', handleFile, false);
 
 var defaults = {
 	subject: 'Intertech',
-	mailbody: 'This is test EMAIL!'
+	mailbody: 'This is test EMAIL!',
+	from: 'example@gmail.com'
 };
 var usersTable = document.getElementById('usersTable');
 var usersLength = 0;
@@ -237,7 +238,7 @@ document.getElementById('addCustomMail').addEventListener('click', function () {
 	parentNode.removeChild(this);
 }, false);
 function hideFileForm () {
-	var formSection, customEmailBody, customEmailBodySection, fixedControls;
+	var formSection, customEmailBody, customEmailBodySection, fixedControls, customSubject;
 	formSection = document.getElementById('input-data-block');
 	formSection.className = 'hidden';
 	formSection.innerHTML = '';
@@ -247,6 +248,18 @@ function hideFileForm () {
 	customEmailBody.className = '';
 	fixedControls = document.getElementById('fixed-controls');
 	fixedControls.className = 'fixed-controls';
+	customSubject = document.getElementById('customSubject');
+	customSubject.addEventListener('change', function (e) {
+		if (this.value) {
+			defaults.subject = this.value;
+		}
+	}, false);
+	customFrom = document.getElementById('from');
+	customFrom.addEventListener('change', function (e) {
+		if (this.value) {
+			defaults.from = this.value;
+		}
+	}, false);
 	customEmailBody.addEventListener('change', function (e) {
 		if (this.value) {
 			mailbody = this.value;
@@ -327,7 +340,7 @@ function renderUser (user) {
 			// link.click();
 			// link = null;
 
-			sendEmail(email, subject, replaceTemplate(generateMailBody(text), {name: name }) );
+			sendEmail(email, subject, replaceTemplate(generateMailBody(text), {name: name }), defaults.from );
 
 			checkbox.checked = true;
 			element.className = 'disabled';
@@ -358,7 +371,7 @@ function sendEmail (email, subject, text, from) {
 		text: text,
 		from: from
 	}, function () {
-		notification('done!');
+		// notification('done!');
 	}, 'html').done(function() {
 		notification( "success" );
 	}).fail(function() {
@@ -394,9 +407,7 @@ function autoSend () {
 	for (var i = 0; i < rows.length; i++) {
 		if (rows[i].className !== "disabled") {
 			rows[i].click();
-			return false;
 		}
-		return false;
 	}
 	return true;
 }

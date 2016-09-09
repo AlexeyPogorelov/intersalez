@@ -43,7 +43,9 @@ var request = sg.emptyRequest({
 // });
 
 router.post('/', function(req, res, next) {
- // console.log(req.body);
+	console.log(req.body.from);
+	console.log(req.body.email);
+	console.log('---------------');
 	res.json({ok:true});
 	// return;
 	sg.API(sg.emptyRequest({
