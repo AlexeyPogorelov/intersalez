@@ -545,14 +545,39 @@ body::-webkit-scrollbar {
   width: 100%;
 }
 
+#usersTable .subject-cell {
+  max-width: 200px;
+  white-space: nowrap;
+}
+
 .customEmailBody {
   text-align: center;
+}
+
+.customEmailBody .form-group.half {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+  width: 49%;
 }
 
 .customEmailBody label {
   display: block;
   margin: 20px 0 0;
   width: 100%;
+}
+
+.customEmailBody input {
+  border: 2px solid #ccc;
+  min-width: 300px;
+  max-width: 600px;
+  width: 50%;
+}
+
+.customEmailBody input:focus, .customEmailBody input:active {
+  box-shadow: outset 0 0 5px #62c1eb;
+  outline-color: #62c1eb;
+  border-color: #62c1eb;
 }
 
 .customEmailBody textarea {

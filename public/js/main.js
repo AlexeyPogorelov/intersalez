@@ -212,6 +212,7 @@ var defaults = {
 var usersTable = document.getElementById('usersTable');
 var usersLength = 0;
 var mailbody = null;
+var sylenth = null;
 
 function generateMailBody (data) {
 	if (data) return data;
@@ -312,16 +313,19 @@ function renderUser (user) {
 	checkboxCell = document.createElement('td');
 	emailCell = document.createElement('td');
 	nameCell = document.createElement('td');
+	subjectCell = document.createElement('td');
 
 	checkbox = document.createElement('input');
 	checkbox.type = "checkbox";
 	checkboxCell.appendChild( checkbox );
 	emailCell.appendChild( createMailLink(email, subject, generateMailBody(text)) );
 	nameCell.innerHTML = '<span>' + name + '</span>';
+	subjectCell.innerHTML = '<span class="subject-cell" alt="' + subject + '">' + subject + '</span>';
 
 	element.appendChild(checkboxCell);
 	element.appendChild(emailCell);
 	element.appendChild(nameCell);
+	element.appendChild(subjectCell);
 
 	if (localStorage.getItem(email)) {
 		checkbox.checked = true;
@@ -340,7 +344,7 @@ function renderUser (user) {
 			// link.click();
 			// link = null;
 
-			sendEmail(email, subject, replaceTemplate(generateMailBody(text), {name: name }), defaults.from );
+			sendEmail(email, subject || defaults.subject, replaceTemplate(generateMailBody(text), {name: name }), defaults.from );
 
 			checkbox.checked = true;
 			element.className = 'disabled';
@@ -366,16 +370,19 @@ function createMailLink (email, subject, text, from) {
 function sendEmail (email, subject, text, from) {
 		// email: email,
 	$.post('/sendemail', {
-		email: 'alexey.intertech@gmail.com',
+		email: email,
 		subject: subject || defaults.subject,
 		text: text,
 		from: from
 	}, function () {
 		// notification('done!');
-	}, 'html').done(function() {
-		notification( "success" );
+	}, 'html').done(function(data) {
+		if (!sylenth) {
+			notification( "success" );
+		}
+		console.log(data);
 	}).fail(function() {
-		notification( "error", "error" );
+		notification( "error " + email, "error" );
 		localStorage.removeItem(email);
 	});
 }
@@ -412,8 +419,12 @@ function autoSend () {
 	return true;
 }
 function allSend () {
+	sylenth = true;
 	var intetval = setInterval(function () {
-		if (autoSend ()) clearInterval(intetval);
+		if (autoSend ()) {
+			sylenth = false;
+			clearInterval(intetval);
+		}
 	}, 300);
 }
 

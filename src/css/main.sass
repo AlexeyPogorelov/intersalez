@@ -72,13 +72,31 @@ body
 			width: 0%
 		&:nth-child(2)
 			width: 100%
+	.subject-cell
+		max-width: 200px
+		white-space: nowrap
 
 .customEmailBody
 	text-align: center
+	.form-group
+		&.half
+			display: inline-block
+			text-align: left
+			vertical-align: top
+			width: 49%
 	label
 		display: block
 		margin: 20px 0 0
 		width: 100%
+	input
+		border: 2px solid #ccc
+		min-width: 300px
+		max-width: 600px
+		width: 50%
+		&:focus, &:active
+			box-shadow: outset 0 0 5px #62c1eb
+			outline-color: #62c1eb
+			border-color: #62c1eb
 	textarea
 		margin: 10px 0 20px
 		display: inline-block
