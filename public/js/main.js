@@ -212,6 +212,10 @@ var defaults = {
 var usersTable = document.getElementById('usersTable');
 var usersLength = 0;
 var mailbody = null;
+if (localStorage.getItem('mailbody')) {
+	mailbody = localStorage.getItem('mailbody');
+}
+
 var sylenth = null;
 
 function generateMailBody (data) {
@@ -238,6 +242,7 @@ document.getElementById('addCustomMail').addEventListener('click', function () {
 	form[0].className = '';
 	parentNode.removeChild(this);
 }, false);
+
 function hideFileForm () {
 	var formSection, customEmailBody, customEmailBodySection, fixedControls, customSubject;
 	formSection = document.getElementById('input-data-block');
@@ -261,12 +266,59 @@ function hideFileForm () {
 			defaults.from = this.value;
 		}
 	}, false);
+	customEmailBody.value = mailbody;
 	customEmailBody.addEventListener('change', function (e) {
 		if (this.value) {
 			mailbody = this.value;
+			localStorage.setItem('mailbody', mailbody);
 		}
 	}, false);
 }
+
+var previewEmail = (function () {
+	var editableElements,
+		toggle = 0,
+		customEmailBody = document.getElementById('customEmailBody'),
+		previewElement = document.createElement('iframe');
+
+		previewElement.className = 'previewElement hidden';
+		customEmailBody.parentNode.insertBefore(previewElement, customEmailBody);
+		// previewElement
+	function fun (e) {
+		if (typeof e === "object") {
+			e.preventDefault();
+		}
+		if (toggle) {
+			toggle = 0;
+			customEmailBody.className = '';
+			previewElement.className = 'previewElement hidden';
+
+			editableElements =  previewElement.getElementsByTagName('p');
+
+			for (var i = 0; i < editableElements.length; i++) {
+				editableElements[i].removeAttribute('contentEditable');
+			}
+
+			customEmailBody.value = previewElement.innerHTML;
+
+		} else {
+			toggle = 1;
+
+			// console.log(previewElement);
+			previewElement.innerHTML = customEmailBody.value;
+			editableElements =  previewElement.getElementsByTagName('p');
+			for (var y = 0; y < editableElements.length; y++) {
+				editableElements[y].contentEditable = true;
+			}
+
+			customEmailBody.className = 'hidden';
+			previewElement.className = 'previewElement';
+		}
+	}
+	return fun;
+})();
+
+
 function replaceTemplate (text, object) {
 	if (typeof object !== 'object' || typeof text !== 'string' || text.length < 5) return text;
 	var prop, expr;
@@ -386,6 +438,8 @@ function sendEmail (email, subject, text, from) {
 		localStorage.removeItem(email);
 	});
 }
+
+
 function saveSentEmails () {
 	var array = [];
 	for (var i = 0; i < localStorage.length; i++) {
@@ -401,6 +455,8 @@ function restoreSentEmails (data) {
 	}
 	return i;
 }
+
+
 function saveFile (string) {
 	var element = document.createElement('span');
 	element.className = 'user-email';
